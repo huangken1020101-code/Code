@@ -2,238 +2,296 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>BlockCode Lab V1</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Code ⇄ Blocks Converter</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,"Microsoft JhengHei",sans-serif;background:#171a21;color:#eee;height:100vh;overflow:hidden}
-header{height:58px;background:#242832;display:flex;align-items:center;padding:0 14px;gap:10px;border-bottom:1px solid #3a3f4b}
-.logo{font-size:20px;font-weight:800;margin-right:auto}
-button,select{background:#303641;color:#fff;border:1px solid #4a5261;border-radius:7px;padding:8px 12px;cursor:pointer}
-button:hover{background:#3b4350}
-.run{background:#3b9d5d;border-color:#58bd78;font-weight:bold}.run:hover{background:#48b96d}
-.main{height:calc(100vh - 58px);display:grid;grid-template-columns:300px 1fr 400px;min-width:900px}
-.panel{border-right:1px solid #343944;overflow:hidden;display:flex;flex-direction:column}
-.panel:last-child{border-right:0;border-left:1px solid #343944}
-.title{padding:10px 12px;background:#20242c;font-weight:bold;border-bottom:1px solid #343944}
-.categories{display:flex;gap:5px;padding:8px;overflow:auto}
-.cat{white-space:nowrap;font-size:12px;padding:6px 9px}
-.cat.active{background:#5965d8}
-.palette{padding:10px;overflow:auto}
-.block{padding:9px 11px;margin:7px 0;border-radius:8px;color:#fff;font-size:14px;cursor:grab;user-select:none;box-shadow:0 2px 4px #0005}
-.block:active{cursor:grabbing}
-.event{background:#d79a25}.motion{background:#377fd1}.control{background:#a84bc3}
-.looks{background:#bd4d82}.variables{background:#d38a29}.operator{background:#4caa63}
-.workspace{display:grid;grid-template-rows:1fr 230px;min-width:0}
-.stage-wrap{padding:14px;display:flex;justify-content:center;align-items:center;background:#11141a}
-.stage{width:min(700px,95%);aspect-ratio:4/3;background:#f7f7f7;position:relative;overflow:hidden;border-radius:8px;box-shadow:0 0 0 2px #343944}
-.sprite{position:absolute;width:48px;height:48px;border-radius:50%;background:#ffcc4d;color:#222;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:bold;transform:translate(-50%,-50%);left:50%;top:50%;transition:left .08s,top .08s}
-.code-panel{background:#11141a;border-top:1px solid #343944;display:flex;flex-direction:column}
-.tabs{height:42px;background:#20242c;display:flex;align-items:center;gap:5px;padding:5px}
-.tab{padding:7px 12px;border:0;background:transparent}.tab.active{background:#394150}
-.editor{flex:1;margin:0;border:0;resize:none;background:#0d1015;color:#d9e2ff;font:14px/1.5 Consolas,monospace;padding:12px;outline:0}
-.script{flex:1;overflow:auto;padding:12px;background:#191c23}
-.dropzone{min-height:100%;border:2px dashed #3d4350;border-radius:10px;padding:10px}
-.dropzone.empty:before{content:"把左側積木拖到這裡";display:block;text-align:center;color:#707887;padding:35px 0}
-.stack{position:relative;margin:6px 0}
-.stack .block{margin:4px 0}
-.nested{margin-left:22px;border-left:3px solid #565d6b;padding-left:7px}
-.block .remove{float:right;background:#0003;border:0;padding:1px 5px;border-radius:4px;font-size:11px}
-input.small{width:55px;background:#ffffff22;color:#fff;border:1px solid #ffffff55;border-radius:4px;padding:3px}
-.status{font-size:12px;color:#9ca5b5;padding:7px 10px;border-top:1px solid #343944}
-@media(max-width:1000px){.main{grid-template-columns:250px 1fr 330px}.logo{font-size:17px}}
+body{margin:0;background:#111318;color:#eee;font-family:Arial,"Microsoft JhengHei",sans-serif;height:100vh;overflow:hidden}
+header{height:58px;background:#20232b;border-bottom:1px solid #3a3e48;display:flex;align-items:center;padding:0 14px;gap:8px}
+.logo{font-size:20px;font-weight:bold;margin-right:auto}
+button{background:#303640;color:#fff;border:1px solid #505766;border-radius:7px;padding:8px 12px;cursor:pointer}
+button:hover{background:#3d4451}.primary{background:#3478d4}.green{background:#388e5b}
+main{height:calc(100vh - 58px);display:grid;grid-template-columns:1fr 1fr;min-width:850px}
+.panel{min-width:0;display:flex;flex-direction:column}
+.panel:first-child{border-right:1px solid #3a3e48}
+.title{height:44px;background:#191c22;padding:12px 14px;font-weight:bold}
+textarea{flex:1;resize:none;border:0;outline:0;background:#0d1015;color:#d7e4ff;padding:14px;font:13px/1.55 Consolas,monospace;tab-size:2}
+.toolbar{padding:8px;background:#191c22;border-top:1px solid #343944;display:flex;gap:7px;flex-wrap:wrap}
+#blocks{flex:1;overflow:auto;padding:16px;background:#15181e}
+.stack{margin-bottom:18px;padding:10px;border:1px dashed #4b5361;border-radius:9px}
+.stack-title{font-size:12px;color:#929baa;margin-bottom:7px}
+.block{position:relative;margin:5px 0;padding:10px 13px;border-radius:7px;color:#fff;font-size:13px;box-shadow:inset 0 -3px #0003;cursor:grab;min-height:38px}
+.block:hover{filter:brightness(1.1)}
+.event{background:#e6a900;color:#111}.function{background:#8e55c9}.control{background:#b44ac4}
+.action{background:#397fd1}.value{background:#3e9b62}.data{background:#d08028}.other{background:#596170}
+.block .x{position:absolute;right:6px;top:5px;background:#0003;border:0;padding:2px 6px;font-size:11px}
+.block input{background:#ffffff22;border:1px solid #ffffff55;color:#fff;border-radius:4px;padding:3px 5px;width:110px}
+.block code{background:#0003;padding:2px 5px;border-radius:4px}
+.nested{margin-left:24px;border-left:3px solid #ffffff33;padding-left:8px}
+.empty{color:#7f8795;text-align:center;padding:50px 10px}
+.badge{font-size:11px;color:#b8c0cc;margin-left:8px}
+.status{font-size:12px;color:#8f98a8;padding:7px 12px;background:#191c22}
+@media(max-width:900px){main{grid-template-columns:1fr}.panel:first-child{display:none}}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">🧱 BlockCode Lab <small style="color:#8d96a7">V1</small></div>
-  <button onclick="newProject()">新專案</button>
-  <button onclick="saveProject()">儲存</button>
-  <button onclick="loadProject()">讀取</button>
-  <button class="run" onclick="runProgram()">▶ 執行</button>
+<div class="logo">🧩 Code ⇄ Blocks <span class="badge">V1</span></div>
+<button onclick="convertToBlocks()" class="primary">← 程式碼轉代碼塊</button>
+<button onclick="convertToCode()" class="green">代碼塊轉程式碼 →</button>
+<button onclick="loadDemo()">載入你的遊戲</button>
+<button onclick="clearAll()">清除</button>
 </header>
-
-<div class="main">
-  <section class="panel">
-    <div class="title">積木</div>
-    <div class="categories">
-      <button class="cat active" data-cat="all">全部</button>
-      <button class="cat" data-cat="event">事件</button>
-      <button class="cat" data-cat="motion">動作</button>
-      <button class="cat" data-cat="control">控制</button>
-      <button class="cat" data-cat="looks">外觀</button>
-      <button class="cat" data-cat="variables">變數</button>
-    </div>
-    <div class="palette" id="palette"></div>
-    <div class="status">提示：拖曳積木到中間區域，或點擊積木加入。</div>
-  </section>
-
-  <section class="workspace">
-    <div class="stage-wrap">
-      <div class="stage" id="stage"><div class="sprite" id="sprite">😺</div></div>
-    </div>
-    <div class="code-panel">
-      <div class="tabs">
-        <button class="tab active" id="codeTab">💻 程式碼</button>
-        <button class="tab" id="blockTab">🧱 積木</button>
-        <button onclick="syncBlocksFromCode()">↻ 程式碼 → 積木</button>
-        <button onclick="syncCodeFromBlocks()">↻ 積木 → 程式碼</button>
-      </div>
-      <textarea class="editor" id="editor" spellcheck="false"></textarea>
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="title">程式積木</div>
-    <div class="script" id="script"><div class="dropzone empty" id="dropzone"></div></div>
-  </section>
+<main>
+<section class="panel">
+<div class="title">💻 程式碼</div>
+<textarea id="code" spellcheck="false"></textarea>
+<div class="toolbar">
+<button onclick="convertToBlocks()" class="primary">解析程式碼</button>
+<button onclick="formatCode()">簡單整理</button>
+<span id="codeStatus" class="status">尚未解析</span>
 </div>
+</section>
+<section class="panel">
+<div class="title">🧩 代碼塊 <span class="badge">可拖曳排序</span></div>
+<div id="blocks"><div class="empty">把 JavaScript 貼到左邊，按「程式碼轉代碼塊」</div></div>
+<div class="toolbar">
+<button onclick="addCustomBlock()">＋ 自訂代碼塊</button>
+<button onclick="convertToCode()" class="green">產生 JavaScript</button>
+<span id="blockStatus" class="status">0 個代碼塊</span>
+</div>
+</section>
+</main>
 
 <script>
-const defs=[
- {type:"start",cat:"event",text:"🟨 當綠旗被點擊",color:"event"},
- {type:"move",cat:"motion",text:"🔵 移動 <input class='small' value='10'> 步",color:"motion"},
- {type:"turn",cat:"motion",text:"🔵 旋轉 <input class='small' value='15'> 度",color:"motion"},
- {type:"goto",cat:"motion",text:"🔵 移到 x:<input class='small' value='0'> y:<input class='small' value='0'>",color:"motion"},
- {type:"say",cat:"looks",text:"🟣 說 <input value='Hello!' style='width:100px'>",color:"looks"},
- {type:"repeat",cat:"control",text:"🟪 重複 <input class='small' value='10'> 次",color:"control"},
- {type:"wait",cat:"control",text:"🟪 等待 <input class='small' value='1'> 秒",color:"control"},
- {type:"set",cat:"variables",text:"🟧 設定 變數 = <input class='small' value='0'>",color:"variables"}
-];
+const code=document.getElementById("code"), blocks=document.getElementById("blocks");
+let nextId=1;
 
-let blocks=[];
-const palette=document.getElementById("palette"), dropzone=document.getElementById("dropzone"), editor=document.getElementById("editor");
-let id=1;
+const demo=`<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>代碼倖存者</title>
+<style>
+body { margin: 0; background: #1e1e1e; color: white; }
+canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-function renderPalette(filter="all"){
- palette.innerHTML="";
- defs.filter(d=>filter==="all"||d.cat===filter).forEach(d=>{
-   const el=makeBlock(d,true);
-   el.onclick=e=>{if(e.target.tagName==="INPUT")return; addBlock(d.type)};
-   el.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",d.type));
-   palette.appendChild(el);
- });
+let wave = 1;
+let gems = 0;
+let coins = 0;
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
-function makeBlock(d,paletteMode=false, data=null){
+
+window.addEventListener('resize', resize);
+resize();
+
+function spawnEnemy() {
+    let ex = Math.random() * canvas.width;
+    let ey = Math.random() * canvas.height;
+    console.log("enemy", ex, ey);
+}
+
+function update() {
+    wave++;
+    if (coins > 10) {
+        gems += 1;
+    }
+}
+
+function gameLoop() {
+    update();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+</body>
+</html>`;
+
+function esc(s){
+ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function cleanCode(s){
+ s=s.replace(/\/\*[\s\S]*?\*\//g,"").replace(/(^|\\n)\s*\/\/.*(?=\\n|$)/g,"$1");
+ return s;
+}
+function classify(text){
+ if(/^(const|let|var)\b/.test(text)||/\b=\s*/.test(text)) return "data";
+ if(/^(function|class)\b/.test(text)||/=>\s*\{/.test(text)) return "function";
+ if(/^(if|else|for|while|switch|try|catch)\b/.test(text)) return "control";
+ if(/(addEventListener|setInterval|setTimeout|requestAnimationFrame|\.push\(|\.forEach\(|console\.)/.test(text)) return "action";
+ return "other";
+}
+function makeBlock(text, level=0){
  const el=document.createElement("div");
- el.className=`block ${d.color}`;
- el.dataset.type=d.type;
- el.draggable=paletteMode;
- let text=d.text;
- if(data){
-   if(d.type==="move") text=`🔵 移動 <input class='small' value='${data.value??10}'> 步`;
-   if(d.type==="turn") text=`🔵 旋轉 <input class='small' value='${data.value??15}'> 度`;
-   if(d.type==="goto") text=`🔵 移到 x:<input class='small' value='${data.x??0}'> y:<input class='small' value='${data.y??0}'>`;
-   if(d.type==="say") text=`🟣 說 <input value="${escapeAttr(data.text??"Hello!")}" style="width:100px">`;
-   if(d.type==="repeat") text=`🟪 重複 <input class='small' value='${data.times??10}'> 次`;
-   if(d.type==="wait") text=`🟪 等待 <input class='small' value='${data.value??1}'> 秒`;
-   if(d.type==="set") text=`🟧 設定 變數 = <input class='small' value='${data.value??0}'>`;
- }
- el.innerHTML=text+(paletteMode?"":`<button class="remove" onclick="removeBlock(${data.id})">×</button>`);
- if(!paletteMode){
-   el.dataset.id=data.id;
-   el.addEventListener("dragstart",e=>e.dataTransfer.setData("move-id",data.id));
- }
+ el.className="block "+classify(text);
+ el.draggable=true;
+ el.dataset.id=nextId++;
+ el.dataset.text=text;
+ el.style.marginLeft=(level*22)+"px";
+ el.innerHTML=`<span>${highlightBlock(text)}</span><button class="x" onclick="removeBlock(this)">×</button>`;
+ el.addEventListener("dragstart",e=>e.dataTransfer.setData("block-id",el.dataset.id));
  return el;
 }
-function escapeAttr(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
-function addBlock(type){
- const d=defs.find(x=>x.type===type); if(!d)return;
- blocks.push({id:id++,type,...defaultData(type)});
- renderBlocks(); syncCodeFromBlocks();
+function highlightBlock(s){
+ let t=esc(s);
+ t=t.replace(/(const|let|var|function|return|if|else|for|while|new|class|async|await)\b/g,"<b>$1</b>");
+ t=t.replace(/(["'`][^"'`]*["'`])/g,"<code>$1</code>");
+ return t;
 }
-function defaultData(type){
- return type==="move"?{value:10}:type==="turn"?{value:15}:type==="goto"?{x:0,y:0}:type==="say"?{text:"Hello!"}:type==="repeat"?{times:10}:type==="wait"?{value:1}:type==="set"?{value:0}:{};
+function removeBlock(btn){btn.parentElement.remove();updateStatus()}
+function updateStatus(){
+ const n=blocks.querySelectorAll(".block").length;
+ document.getElementById("blockStatus").textContent=n+" 個代碼塊";
 }
-function removeBlock(i){blocks=blocks.filter(b=>b.id!==i);renderBlocks();syncCodeFromBlocks()}
-function readInputs(){
- [...dropzone.querySelectorAll(".block")].forEach(el=>{
-   const b=blocks.find(x=>x.id==el.dataset.id); if(!b)return;
-   const ins=el.querySelectorAll("input");
-   if(b.type==="move"||b.type==="turn"||b.type==="wait"||b.type==="set")b.value=Number(ins[0].value);
-   if(b.type==="goto"){b.x=Number(ins[0].value);b.y=Number(ins[1].value)}
-   if(b.type==="say")b.text=ins[0].value;
-   if(b.type==="repeat")b.times=Math.max(0,Number(ins[0].value));
- });
-}
-function renderBlocks(){
- dropzone.innerHTML="";
- dropzone.classList.toggle("empty",blocks.length===0);
- blocks.forEach(b=>{
-   const d=defs.find(x=>x.type===b.type), el=makeBlock(d,false,b);
-   dropzone.appendChild(el);
- });
-}
-dropzone.addEventListener("dragover",e=>e.preventDefault());
-dropzone.addEventListener("drop",e=>{
- e.preventDefault();
- const t=e.dataTransfer.getData("text/plain"), mid=e.dataTransfer.getData("move-id");
- if(t){addBlock(t)}
- else if(mid){
-   const b=blocks.find(x=>x.id==mid); if(b){blocks=blocks.filter(x=>x.id!=mid);blocks.push(b);renderBlocks();syncCodeFromBlocks()}
+function splitTopLevel(src){
+ const out=[];let start=0,brace=0,paren=0,bracket=0,quote=null,escape=false;
+ for(let i=0;i<src.length;i++){
+   const c=src[i];
+   if(quote){
+     if(escape) escape=false;
+     else if(c==="\\") escape=true;
+     else if(c===quote) quote=null;
+     continue;
+   }
+   if(c==="'"||c=='"'||c==="`"){quote=c;continue}
+   if(c==="{")brace++; if(c==="}")brace--;
+   if(c==="(")paren++; if(c===")")paren--;
+   if(c==="[")bracket++; if(c==="]")bracket--;
+   if((c===";"||c==="}")||c==="\\n")&&brace===0&&paren===0&&bracket===0){
+     let part=src.slice(start,i+1).trim();
+     if(part)out.push(part);
+     start=i+1;
+   }
  }
+ let tail=src.slice(start).trim();if(tail)out.push(tail);
+ return out;
+}
+function parseStatements(src){
+ const arr=[];let i=0,start=0,depth=0,quote=null,escape=false;
+ while(i<src.length){
+   let c=src[i];
+   if(quote){
+    if(escape)escape=false;else if(c==="\\")escape=true;else if(c===quote)quote=null;
+    i++;continue;
+   }
+   if(c==="'"||c=='"'||c==="`"){quote=c;i++;continue}
+   if(c==="{"){
+     if(depth===0){
+       let before=src.slice(start,i).trim();
+       let end=findMatching(src,i,"{","}");
+       if(end<0)break;
+       let body=src.slice(i+1,end).trim();
+       if(before) arr.push({head:before,body});
+       start=end+1;i=end+1;continue;
+     }
+     depth++;
+   }
+   if(c==="}")depth--;
+   if(c===";"&&depth===0){
+     let part=src.slice(start,i+1).trim();
+     if(part)arr.push({head:part});
+     start=i+1;
+   }
+   i++;
+ }
+ let tail=src.slice(start).trim();if(tail)arr.push({head:tail});
+ return arr;
+}
+function findMatching(s,pos,open,close){
+ let d=0,q=null,e=false;
+ for(let i=pos;i<s.length;i++){
+  let c=s[i];
+  if(q){if(e)e=false;else if(c==="\\")e=true;else if(c===q)q=null;continue}
+  if(c==="'"||c=='"'||c==="`"){q=c;continue}
+  if(c===open)d++;if(c===close){d--;if(d===0)return i}
+ }
+ return -1;
+}
+function addParsed(parent,src,level=0){
+ const statements=parseStatements(src);
+ statements.forEach(st=>{
+   let text=st.head.trim();
+   if(!text)return;
+   const b=makeBlock(text,level);
+   parent.appendChild(b);
+   if(st.body!==undefined){
+     const nested=document.createElement("div");nested.className="nested";
+     parent.appendChild(nested);
+     addParsed(nested,st.body,level+1);
+   }
+ });
+}
+function convertToBlocks(){
+ const src=cleanCode(code.value);
+ blocks.innerHTML="";
+ const scriptMatch=src.match(/<script[^>]*>([\\s\\S]*?)<\\/script>/gi);
+ let js=src;
+ if(scriptMatch) js=scriptMatch.map(x=>x.replace(/<script[^>]*>/i,"").replace(/<\\/script>/i,"")).join("\\n");
+ const container=document.createElement("div");
+ const top=splitTopLevel(js);
+ if(!top.length){blocks.innerHTML='<div class="empty">沒有找到可解析的 JavaScript。</div>';return}
+ const stack=document.createElement("div");stack.className="stack";
+ const title=document.createElement("div");title.className="stack-title";title.textContent="SCRIPT / JavaScript 結構";
+ stack.appendChild(title);
+ addParsed(stack,top.join("\\n"));
+ blocks.appendChild(stack);
+ updateStatus();
+ document.getElementById("codeStatus").textContent="解析完成：保留原始 JavaScript 結構";
+}
+function convertToCode(){
+ const all=blocks.querySelectorAll(".block");
+ let lines=[];
+ all.forEach(b=>{
+   const level=Math.round(parseInt(b.style.marginLeft||0)/22);
+   lines.push("    ".repeat(level)+b.dataset.text);
+ });
+ code.value=lines.join("\\n");
+ document.getElementById("codeStatus").textContent="已由代碼塊產生 JavaScript";
+}
+function addCustomBlock(){
+ const stack=blocks.querySelector(".stack");
+ if(!stack){blocks.innerHTML="";const s=document.createElement("div");s.className="stack";blocks.appendChild(s)}
+ const text=prompt("輸入這個代碼塊代表的 JavaScript：","console.log('Hello');");
+ if(text)blocks.querySelector(".stack").appendChild(makeBlock(text));
+ updateStatus();
+}
+function formatCode(){
+ let s=code.value.replace(/;\\s*/g,";\\n").replace(/\\{\\s*/g," {\\n").replace(/\\}\\s*/g,"\\n}\\n");
+ let depth=0,out=[];
+ s.split("\\n").forEach(line=>{
+   line=line.trim();if(!line)return;
+   if(line.startsWith("}"))depth=Math.max(0,depth-1);
+   out.push("    ".repeat(depth)+line);
+   if(line.endsWith("{"))depth++;
+ });
+ code.value=out.join("\\n");
+}
+function clearAll(){if(confirm("清除目前程式碼和代碼塊？")){code.value="";blocks.innerHTML='<div class="empty">尚未建立代碼塊</div>';updateStatus()}}
+function loadDemo(){code.value=demo;convertToBlocks()}
+blocks.addEventListener("dragover",e=>e.preventDefault());
+blocks.addEventListener("drop",e=>{
+ const id=e.dataTransfer.getData("block-id");if(!id)return;
+ const el=blocks.querySelector('[data-id="'+id+'"]');if(!el)return;
+ const target=e.target.closest(".block,.nested,.stack");
+ if(target && target!==el){
+   if(target.classList.contains("block"))target.parentNode.insertBefore(el,target);
+   else target.appendChild(el);
+ }
+ updateStatus();
 });
-
-function syncCodeFromBlocks(){
- readInputs();
- let out="// BlockCode Lab\n// 這份程式碼可再轉回積木\n\n";
- blocks.forEach(b=>{out+=codeFor(b)+"\n"});
- editor.value=out;
-}
-function codeFor(b){
- switch(b.type){
-  case"start":return"whenGreenFlagClicked(() => {";
-  case"move":return`move(${b.value});`;
-  case"turn":return`turn(${b.value});`;
-  case"goto":return`goTo(${b.x}, ${b.y});`;
-  case"say":return`say(${JSON.stringify(b.text)});`;
-  case"repeat":return`repeat(${b.times}, () => {\\n    // 重複區塊\\n});`;
-  case"wait":return`wait(${b.value});`;
-  case"set":return`setVariable("variable", ${b.value});`;
-  default:return"";
- }
-}
-function syncBlocksFromCode(){
- const src=editor.value;
- const result=[];
- if(/whenGreenFlagClicked\s*\(/.test(src))result.push({id:id++,type:"start"});
- const re=/\bmove\s*\(\s*(-?\d+(?:\.\d+)?)\s*\)|\bturn\s*\(\s*(-?\d+(?:\.\d+)?)\s*\)|\bgoTo\s*\(\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)|\bsay\s*\(\s*["'`](.*?)["'`]\s*\)|\brepeat\s*\(\s*(\d+)\s*,|\bwait\s*\(\s*(\d+(?:\.\d+)?)\s*\)/g;
- let m;
- while((m=re.exec(src))){
-  if(m[1]!==undefined)result.push({id:id++,type:"move",value:Number(m[1])});
-  else if(m[2]!==undefined)result.push({id:id++,type:"turn",value:Number(m[2])});
-  else if(m[3]!==undefined)result.push({id:id++,type:"goto",x:Number(m[3]),y:Number(m[4])});
-  else if(m[5]!==undefined)result.push({id:id++,type:"say",text:m[5]});
-  else if(m[6]!==undefined)result.push({id:id++,type:"repeat",times:Number(m[6])});
-  else if(m[7]!==undefined)result.push({id:id++,type:"wait",value:Number(m[7])});
- }
- blocks=result;renderBlocks();
-}
-async function runProgram(){
- readInputs(); syncCodeFromBlocks();
- const sprite=document.getElementById("sprite");
- let x=50,y=50,angle=0;
- sprite.style.left=x+"%";sprite.style.top=y+"%";sprite.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;
- const move=n=>{const r=angle*Math.PI/180;x+=Math.cos(r)*n/7;y+=Math.sin(r)*n/7;x=Math.max(4,Math.min(96,x));y=Math.max(5,Math.min(95,y));sprite.style.left=x+"%";sprite.style.top=y+"%"};
- for(const b of blocks){
-   if(b.type==="move")move(b.value);
-   else if(b.type==="turn"){angle+=b.value;sprite.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`}
-   else if(b.type==="goto"){x=50+b.x/7;y=50-b.y/7;sprite.style.left=x+"%";sprite.style.top=y+"%"}
-   else if(b.type==="say"){sprite.textContent="💬";setTimeout(()=>sprite.textContent="😺",1200);await sleep(1200)}
-   else if(b.type==="wait")await sleep(b.value*1000);
-   else if(b.type==="repeat"){for(let i=0;i<b.times;i++)move(10)}
- }
-}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-function newProject(){blocks=[];renderBlocks();editor.value="// 新專案\\n";resetSprite()}
-function resetSprite(){const s=document.getElementById("sprite");s.style.left="50%";s.style.top="50%";s.textContent="😺"}
-function saveProject(){readInputs();localStorage.setItem("blockcode-v1",JSON.stringify({blocks,code:editor.value}));alert("已儲存到瀏覽器！")}
-function loadProject(){const x=JSON.parse(localStorage.getItem("blockcode-v1")||"null");if(!x)return alert("沒有儲存的專案");blocks=x.blocks||[];editor.value=x.code||"";renderBlocks()}
-document.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderPalette(b.dataset.cat)});
-document.getElementById("codeTab").onclick=()=>{document.querySelector(".editor").style.display="block"};
-document.getElementById("blockTab").onclick=()=>{syncBlocksFromCode();document.querySelector(".editor").style.display="block"};
-editor.value="// BlockCode Lab V1\n// 從左側加入積木開始吧！";
-renderPalette();
+code.value=demo;
+convertToBlocks();
 </script>
 </body>
 </html>
